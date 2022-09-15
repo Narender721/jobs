@@ -10,4 +10,6 @@ public class AccessManagerV2Application {
 		SpringApplication.run(AccessManagerV2Application.class, args);
 	}
 
+
 }
+
