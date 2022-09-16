@@ -88,7 +88,8 @@ public class TestUnit {
 
         webTestClient.post().uri("/addUnit")
                 .body(Mono.just(data1),UnitsModel.class)
-                .exchange().expectStatus().isOk();
+                .exchange().expectStatus().isOk()
+                .expectBody(UnitsModel.class).isEqualTo(data1);
     }
 
     @Test
