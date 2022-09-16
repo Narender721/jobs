@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springdoc.core.annotations.RouterOperation;
 import org.springdoc.core.annotations.RouterOperations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -31,6 +32,12 @@ public class UnitRouter {
 
     @Autowired
     UnitService unitService;
+
+    @Bean
+    public WebProperties.Resources resources() {
+        return new WebProperties.Resources();
+    }
+
 
     @Bean
     @RouterOperations(
@@ -90,7 +97,7 @@ public class UnitRouter {
                                 .and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)),
                         request -> request.body(BodyExtractors.toMono(UnitsModel.class))
                                 .flatMap(u -> unitService.update(u))
-                                .flatMap(data -> ok().contentType(MediaType.APPLICATION_JSON).bodyValue(data)))
+                                .flatMap(data -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(data)))
                 .andRoute(RequestPredicates.DELETE("/delete/{unit_Id}"),
                         request -> unitService.deleteUnit(request.pathVariable("unit_Id"))
                                 .flatMap(data -> ok().contentType(MediaType.APPLICATION_JSON).bodyValue(data))) //change
