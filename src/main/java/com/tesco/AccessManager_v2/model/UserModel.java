@@ -14,12 +14,14 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document
-@Collection("Units")
+@Collection("Users")
 @NotNull
-public class UnitsModel {
+public class UserModel {
 
     @Id
-    private int unit_Id;
+    private int user_Id;
     @Field
-    private String unit_Name;
+    private String user_Name;
+    @Field("UnitsModel")
+    UnitsModel unitsModel;
 }
