@@ -14,6 +14,7 @@ steps:
   displayName: 'Maven Package'
   inputs:
     mavenPomFile: 'pom.xml'
+    goals: 'clean package'
     publishJUnitResults: true
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
     javaHomeOption: 'Path'
