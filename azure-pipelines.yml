@@ -7,7 +7,7 @@ trigger:
 - none
 
 pool:
-  name: 'tpc012911'
+  name: 'CP-Azure-agent-VM'
 
 steps: 
 - task: Maven@3
