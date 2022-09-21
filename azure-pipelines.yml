@@ -15,8 +15,7 @@ steps:
   inputs:
     mavenPomFile: 'pom.xml'
     goals: 'clean package'
-    publishJUnitResults: true
-    testResultsFiles: '**/surefire-reports/TEST-*.xml'
+    publishJUnitResults: false
     javaHomeOption: 'Path'
     jdkDirectory: '/usr/lib/jvm/jre-openjdk'
     mavenVersionOption: 'Path'
