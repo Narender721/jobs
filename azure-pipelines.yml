@@ -37,3 +37,12 @@ steps:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'drop'
     publishLocation: 'Container'
+- task: Docker@2
+  displayName: Build docker image
+  inputs:
+      targetType: "inline"
+      command: 'buildAndPush'
+      Dockerfile: '**/Dockerfile'
+      script:
+        docker build --no-cache -t $(dockerImageName) $(Build.SourcesDirectory)
+
