@@ -7,7 +7,7 @@ trigger:
 - none
 
 pool:
-  name: "tpc012911" 
+  name: "tpc012911"
 
 steps: 
 - task: Maven@3
