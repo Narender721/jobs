@@ -12,24 +12,9 @@ pool:
 steps: 
 - task: Maven@3
   displayName: 'Maven Package'
-- task: Maven@3
   inputs:
     mavenPomFile: 'pom.xml'
     goals: 'clean'
-    publishJUnitResults: true
-    testResultsFiles: '**/surefire-reports/TEST-*.xml'
-    javaHomeOption: 'Path'
-    jdkDirectory: '/usr/lib/jvm/jre-openjdk'
-    mavenVersionOption: 'Path'
-    mavenDirectory: '/opt/maven'
-    mavenSetM2Home: true
-    mavenOptions: '-Xmx3072m'
-    mavenAuthenticateFeed: false
-    effectivePomSkip: false
-    sonarQubeRunAnalysis: false
-  inputs:
-    mavenPomFile: 'pom.xml'
-    goals: 'clean package'
     publishJUnitResults: true
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
     javaHomeOption: 'Path'
