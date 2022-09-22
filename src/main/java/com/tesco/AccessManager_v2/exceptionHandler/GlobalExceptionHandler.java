@@ -1,5 +1,7 @@
 package com.tesco.AccessManager_v2.exceptionHandler;
 
+import com.tesco.AccessManager_v2.exception.DBEmptyException;
+//import com.tesco.AccessManager_v2.exception.DuplicateEntryException;
 import com.tesco.AccessManager_v2.exception.IdNullException;
 import com.tesco.AccessManager_v2.exception.UnitNotFoundException;
 import org.springframework.boot.autoconfigure.web.WebProperties.Resources;
@@ -54,6 +56,18 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler{
             return ServerResponse.status(HttpStatus.NOT_FOUND).
                     contentType(MediaType.APPLICATION_JSON).
                     body(BodyInserters.fromValue(error));
+        }
+
+//        if(errorThrowable instanceof DuplicateEntryException){
+//            return ServerResponse.status(HttpStatus.NOT_FOUND)
+//                    .contentType(MediaType.APPLICATION_JSON)
+//                    .body(BodyInserters.fromValue(error));
+//        }
+
+        if(errorThrowable instanceof DBEmptyException){
+            return ServerResponse.status(HttpStatus.NOT_FOUND)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(BodyInserters.fromValue(error));
         }
 
         return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).

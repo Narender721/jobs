@@ -1,9 +1,13 @@
 package com.tesco.AccessManager_v2.router;
 
+import com.tesco.AccessManager_v2.model.UnitsModel;
 import com.tesco.AccessManager_v2.model.UserModel;
 import com.tesco.AccessManager_v2.service.UserServiceImpl;
+import com.tesco.AccessManager_v2.utils.Constants;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -24,9 +28,13 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
+import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
+import static org.springframework.web.reactive.function.server.ServerResponse.ok;
+
 @Controller
 @Slf4j
 @Tag(name = "User APIs", description = "User api collection")
+//@RouterOperation(path = Constants.UserPaths.BASEPATH_USER)
 public class UserRouter {
 
     @Autowired
@@ -40,7 +48,7 @@ public class UserRouter {
     @Bean
     @RouterOperations(
             {
-                    @RouterOperation(path = "/user/create", produces = {MediaType.APPLICATION_JSON_VALUE},
+                    @RouterOperation(path = Constants.UserPaths.ADD_USER, produces = {MediaType.APPLICATION_JSON_VALUE},
                             method = RequestMethod.POST,
                             operation = @Operation(operationId = "addUsers", responses = {
                                     @ApiResponse(responseCode = "200", description = "success", content = @Content(schema = @Schema(implementation = UserModel.class))),
@@ -48,26 +56,73 @@ public class UserRouter {
                                     @ApiResponse(responseCode = "404", description = "create end point not found")},
                                     requestBody = @RequestBody(content = @Content(schema = @Schema(implementation = UserModel.class)))
                             )),
-                    @RouterOperation(path= "/user/getUsersByUnit/{unitId}", produces = {MediaType.APPLICATION_JSON_VALUE},
+                    @RouterOperation(path= Constants.UserPaths.GET_USER_BYUNIT, produces = {MediaType.APPLICATION_JSON_VALUE},
                             method = RequestMethod.GET,
                             operation = @Operation(operationId = "getUsersByUnit", responses = {
                                     @ApiResponse(responseCode = "200", description = "Success", content = @Content(schema = @Schema(implementation = UserModel.class))),
                                     @ApiResponse(responseCode = "400", description = "Bad Request"),
                                     @ApiResponse(responseCode = "404", description = "Unit not found")},
+                                    parameters = {@Parameter(in = ParameterIn.PATH, name = "unit_Id")}
+                            )),
+                    @RouterOperation(path = Constants.UserPaths.GET_USERS, produces = {
+                            MediaType.APPLICATION_JSON_VALUE} ,method = RequestMethod.GET,
+                            operation = @Operation(operationId = "getUsers", responses = {
+                                    @ApiResponse(responseCode = "200", description = "success", content = @Content(schema = @Schema(implementation = UserModel.class))),
+                                    @ApiResponse(responseCode = "404", description = "Not found")}
+                            )),
+                    @RouterOperation(path = Constants.UserPaths.USER_ID, produces = {
+                            MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET,
+                            operation = @Operation(operationId = "getUserByUserId", responses = {
+                                    @ApiResponse(responseCode = "200", description = "success", content = @Content(schema = @Schema(implementation = UserModel.class))),
+                                    @ApiResponse(responseCode = "404", description = "Not found")},
+                                    parameters = {@Parameter(in = ParameterIn.PATH, name = "user_Id")}
+                            )),
+                    @RouterOperation(path = Constants.UserPaths.UPDATE_USER, produces = {
+                            MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.POST,
+                            operation = @Operation(operationId = "updateUser", responses = {
+                                    @ApiResponse(responseCode = "200", description = "success", content = @Content(schema = @Schema(implementation = UnitsModel.class))),
+                                    @ApiResponse(responseCode = "404", description = "Not found")},
                                     requestBody = @RequestBody(content = @Content(schema = @Schema(implementation = UserModel.class)))
+
+                            )),
+                    @RouterOperation(path = Constants.UserPaths.DELETE_USER, produces = {
+                            MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.DELETE,
+                            operation = @Operation(operationId = "delete", responses = {
+                                    @ApiResponse(responseCode = "200", description = "success", content = @Content(schema = @Schema(implementation = UserModel.class))),
+                                    @ApiResponse(responseCode = "404", description = "Not found")},
+                                    parameters = {@Parameter(in = ParameterIn.PATH, name = "user_Id")}
                             ))
             })
 
 
     RouterFunction<ServerResponse> routeUser(){
 
-        return RouterFunctions.route(RequestPredicates.POST("/user/create").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), req ->
+        return RouterFunctions.route(RequestPredicates.POST(Constants.UserPaths.ADD_USER).and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), req ->
                         req.body(BodyExtractors.toMono(UserModel.class)).flatMap(user ->
                                 userService.addUser(user)).flatMap(data ->
                                 ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(data)))
-                .andRoute(RequestPredicates.GET("/user/getUsersByUnit/{unitId}"), request ->
-                        userService.getUsersByUnit(request.pathVariable("unit_Id"))
-                                .flatMap(data -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(data)));
+
+                .andRoute(GET(Constants.UserPaths.GET_USERS),
+                        request -> userService.getUsers().collectList()
+                                .flatMap(data-> ok().contentType(MediaType.APPLICATION_JSON).bodyValue(data)))
+
+                .andRoute(GET(Constants.UserPaths.USER_ID),
+                        request -> userService.getUserByUserId(request.pathVariable("user_Id"))
+                        .flatMap(data-> ok().contentType(MediaType.APPLICATION_JSON).bodyValue(data)))
+
+                .andRoute(RequestPredicates.GET(Constants.UserPaths.GET_USER_BYUNIT),
+                        request -> userService.getUsersByUnit(request.pathVariable("unit_Id")).collectList()
+                                .flatMap(data -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(data)))
+
+                .andRoute(RequestPredicates.POST(Constants.UserPaths.UPDATE_USER)
+                                .and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)),
+                        request -> request.body(BodyExtractors.toMono(UserModel.class))
+                                .flatMap(u -> userService.updateUser(u))
+                                .flatMap(data -> ok().contentType(MediaType.APPLICATION_JSON).bodyValue(data)))
+
+                .andRoute(RequestPredicates.DELETE(Constants.UserPaths.DELETE_USER),
+                        request -> userService.deleteUser(request.pathVariable("user_Id"))
+                                .flatMap(data -> ServerResponse.noContent().build()));
 
     }
 

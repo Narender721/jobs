@@ -8,6 +8,7 @@ import org.springframework.data.couchbase.core.mapping.Document;
 import org.springframework.data.couchbase.core.mapping.Field;
 import org.springframework.data.couchbase.repository.Collection;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 @Data

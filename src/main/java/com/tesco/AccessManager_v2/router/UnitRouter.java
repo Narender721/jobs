@@ -1,7 +1,9 @@
 package com.tesco.AccessManager_v2.router;
 
 import com.tesco.AccessManager_v2.model.UnitsModel;
+//import com.tesco.AccessManager_v2.service.GenerateThread;
 import com.tesco.AccessManager_v2.service.UnitServiceImpl;
+import com.tesco.AccessManager_v2.utils.Constants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -20,14 +22,10 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.reactive.function.BodyExtractors;
-import org.springframework.web.reactive.function.server.RequestPredicates;
-import org.springframework.web.reactive.function.server.RouterFunction;
-import org.springframework.web.reactive.function.server.RouterFunctions;
-import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.reactive.function.server.*;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
-
 
 @Controller
 @Slf4j
@@ -37,6 +35,9 @@ public class UnitRouter {
     @Autowired
     UnitServiceImpl unitService;
 
+//    @Autowired
+//    GenerateThread generateThread;
+
     @Bean
     public WebProperties.Resources resources() {
         return new WebProperties.Resources();
@@ -44,29 +45,30 @@ public class UnitRouter {
 
 
     @Bean
+//    @RouterOperation(path = Constants.UnitPaths.BASEPATH_UNIT)
     @RouterOperations(
             {
-                    @RouterOperation(path = "/units", produces = {
+                    @RouterOperation(path = Constants.UnitPaths.GETUNITS, produces = {
                             MediaType.APPLICATION_JSON_VALUE} ,method = RequestMethod.GET,
                             operation = @Operation(operationId = "getUnit", responses = {
                                     @ApiResponse(responseCode = "200", description = "success", content = @Content(schema = @Schema(implementation = UnitsModel.class))),
                                     @ApiResponse(responseCode = "404", description = "Not found")}
                             )),
-                    @RouterOperation(path = "/unit/{unit_Id}", produces = {
+                    @RouterOperation(path = Constants.UnitPaths.UNIT_ID , produces = {
                             MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET,
                             operation = @Operation(operationId = "getUnitById", responses = {
                                     @ApiResponse(responseCode = "200", description = "success", content = @Content(schema = @Schema(implementation = UnitsModel.class))),
                                     @ApiResponse(responseCode = "404", description = "Not found")},
                                     parameters = {@Parameter(in = ParameterIn.PATH, name = "unit_Id")}
                             )),
-                    @RouterOperation(path = "/addUnit", produces = {
+                    @RouterOperation(path = Constants.UnitPaths.ADDUNIT, produces = {
                             MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.POST,
                             operation = @Operation(operationId = "add", responses = {
                                     @ApiResponse(responseCode = "200", description = "success", content = @Content(schema = @Schema(implementation = UnitsModel.class))),
                                     @ApiResponse(responseCode = "404", description = "Not found")},
                                     requestBody = @RequestBody(content = @Content(schema = @Schema(implementation = UnitsModel.class)))
                             )),
-                    @RouterOperation(path = "/update", produces = {
+                    @RouterOperation(path = Constants.UnitPaths.UPDATE, produces = {
                             MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.POST,
                             operation = @Operation(operationId = "update", responses = {
                                     @ApiResponse(responseCode = "200", description = "success", content = @Content(schema = @Schema(implementation = UnitsModel.class))),
@@ -74,40 +76,50 @@ public class UnitRouter {
                                     requestBody = @RequestBody(content = @Content(schema = @Schema(implementation = UnitsModel.class)))
 
                             )),
-                    @RouterOperation(path = "/delete/{unit_Id}", produces = {
+                    @RouterOperation(path = Constants.UnitPaths.DELETE, produces = {
                             MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.DELETE,
                             operation = @Operation(operationId = "delete", responses = {
                                     @ApiResponse(responseCode = "200", description = "success", content = @Content(schema = @Schema(implementation = UnitsModel.class))),
                                     @ApiResponse(responseCode = "404", description = "Not found")},
                                     parameters = {@Parameter(in = ParameterIn.PATH, name = "unit_Id")}
                             ))
+//                    @RouterOperation(path = "/thread", produces = {
+//                            MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET,
+//                            operation = @Operation(operationId = "threadDump", responses = {
+//                                    @ApiResponse(responseCode = "200", description = "success"),
+//                                    @ApiResponse(responseCode = "404", description = "Not found")}
+//                            ))
             })
 
 
-    RouterFunction<ServerResponse> routeUnit(){
+    RouterFunction<ServerResponse> routeUnit() throws Exception {
 
         return RouterFunctions
-                .route(GET("/unit/{unit_Id}"),
+                .route(GET(Constants.UnitPaths.UNIT_ID),
                         request -> unitService.getUnitById(request.pathVariable("unit_Id"))
-                                .flatMap(data-> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(data)))
+                                .flatMap(data-> ok().contentType(MediaType.APPLICATION_JSON).bodyValue(data)))
 
-                .andRoute(RequestPredicates.POST("/addUnit")
+                .andRoute(RequestPredicates.POST(Constants.UnitPaths.ADDUNIT)
                                 .and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)),
                         request -> request.body(BodyExtractors.toMono(UnitsModel.class))
                                 .flatMap(u -> unitService.add(u))
-                                .flatMap(data -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(data)))
+                                .flatMap(data -> ok().contentType(MediaType.APPLICATION_JSON).bodyValue(data)))
 
-                .andRoute(RequestPredicates.POST("/update")
+                .andRoute(RequestPredicates.POST(Constants.UnitPaths.UPDATE)
                                 .and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)),
                         request -> request.body(BodyExtractors.toMono(UnitsModel.class))
                                 .flatMap(u -> unitService.update(u))
-                                .flatMap(data -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(data)))
-                .andRoute(RequestPredicates.DELETE("/delete/{unit_Id}"),
+                                .flatMap(data -> ok().contentType(MediaType.APPLICATION_JSON).bodyValue(data)))
+                .andRoute(RequestPredicates.DELETE(Constants.UnitPaths.DELETE),
                         request -> unitService.deleteUnit(request.pathVariable("unit_Id"))
-                                .flatMap(data -> ok().contentType(MediaType.APPLICATION_JSON).bodyValue(data))) //change
-                .andRoute(GET("/units"),
+//                                .flatMap(data -> ok().contentType(MediaType.APPLICATION_JSON).bodyValue(data))) //change
+                                .flatMap(data -> ServerResponse.noContent().build()))
+
+                .andRoute(GET(Constants.UnitPaths.GETUNITS),
                         request -> unitService.getUnits().collectList()
-                                .flatMap(data->ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(data)));
+                                .flatMap(data-> ok().contentType(MediaType.APPLICATION_JSON).bodyValue(data)));
+//                .andRoute(GET("/thread").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), (HandlerFunction<ServerResponse>) generateThread.threadDump());
+
     }
 
 }
