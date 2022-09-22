@@ -48,3 +48,8 @@ steps:
     command: 'buildAndPush'
     Dockerfile: '**/Dockerfile'
 
+- task: Bash@3
+  displayName: "Removing docker image"
+  inputs:
+    targetType: 'inline'
+    script: 'docker rmi -f $(docker images -q $(dockerImageName))'
