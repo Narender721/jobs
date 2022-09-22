@@ -214,4 +214,12 @@ public class TestUnit {
                 .expectBody();
 //                .json("{\"message\":\"Provide proper ID value\"}\n");
     }
+
+//    @Test
+//    public void test(){
+//
+//        webTestClient.post().uri("/unit/update")
+//                .exchange()
+//                .expectStatus().is5xxServerError();
+//    }
 }
