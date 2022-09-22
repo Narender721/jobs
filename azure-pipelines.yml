@@ -47,6 +47,18 @@ steps:
     repository: 'imagebuild7 / react'
     command: 'buildAndPush'
     Dockerfile: '**/Dockerfile'
+    tags: 
+      tag1
+      tag2
+- task: Docker@2
+  inputs:
+    containerRegistry: 'Docker'
+    repository: 'imagebuild7 / react'
+    command: 'buildAndPush'
+    Dockerfile: '**/Dockerfile'
+    tags: |
+      beta.1
+      latest
 
 - task: Bash@3
   displayName: "Removing docker image"
