@@ -1,13 +1,8 @@
-FROM node:16-alpine as build-stage
 
-ARG APP_HOME=/app
-ARG PUBLIC_URL
-ENV PUBLIC_URL=${PUBLIC_URL:-}
+FROM openjdk:8-jdk-alpine as build-stage
 
-WORKDIR ${APP_HOME}
-COPY . ${APP_HOME}
+ARG JAR_FILE=target/*.jar
 
-ENV PATH ${APP_HOME}/node_modules/.bin:$PATH
+COPY ${JAR_FILE} app.jar
 
-RUN npm install
-RUN npm run build
+ENTRYPOINT ["java","-jar","/app.jar"]
