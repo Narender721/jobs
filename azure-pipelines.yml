@@ -44,6 +44,7 @@ steps:
 - task: Docker@2
   inputs:
     containerRegistry: 'Docker'
+    repository: 'imagebuild7 / react'
     command: 'buildAndPush'
     Dockerfile: '**/Dockerfile'
 
