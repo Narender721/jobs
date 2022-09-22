@@ -41,15 +41,7 @@ steps:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'drop'
     publishLocation: 'Container'
-- task: Docker@2
-  inputs:
-    containerRegistry: 'Docker'
-    repository: 'imagebuild7 / react'
-    command: 'buildAndPush'
-    Dockerfile: '**/Dockerfile'
-    tags: 
-      tag1
-      tag2
+      
 - task: Docker@2
   inputs:
     containerRegistry: 'Docker'
