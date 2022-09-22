@@ -45,4 +45,4 @@ steps:
   inputs: 
     targetType: "inline"
     script:
-      docker build --no-cache -t $(dockerImageName)
+      docker build --no-cache -t $(Dockerfile) $(Build.SourcesDirectory)
