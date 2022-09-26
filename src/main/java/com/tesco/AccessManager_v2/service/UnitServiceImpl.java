@@ -31,6 +31,12 @@ public class UnitServiceImpl implements UnitService{
             throw new IdNullException();
 
         log.debug("return Unit details for Unit " + unitId);
+
+        Mono<UnitsModel> check = unitsRepository.findById(unitId);
+        UnitsModel model1 = check.share().block();
+        assert model1 != null;
+        System.out.println(model1.getUnit_Name());
+
         return unitsRepository.findById(unitId).switchIfEmpty(Mono.error(new UnitNotFoundException(unitId)));
     }
 
@@ -44,6 +50,9 @@ public class UnitServiceImpl implements UnitService{
 //            throw new IdNullException();
 //        }
         Mono<UnitsModel> check = unitsRepository.findById(model.getUnit_Id());
+        UnitsModel model1 = check.share().block();
+        assert model1 != null;
+        System.out.println(model1.getUnit_Name());
 //        Mono<Boolean> cc= check.hasElement();
 //        //        unitsRepository.findById(id).thenReturn(new duplicateEntryException(id));
 //        System.out.println(cc);
