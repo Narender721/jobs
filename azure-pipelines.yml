@@ -4,7 +4,7 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/java
 
 trigger:
-- none
+- main
 
 pool:
   name: 'CP-Azure-agent-VM'
@@ -48,7 +48,10 @@ steps:
     repository: 'imagebuild7 / react'
     command: 'buildAndPush'
     Dockerfile: '**/Dockerfile'
-    tags: '$(Build.BuildId)'
+    tags: |
+      latest
+      $(Build.BuildId)
+    
 
 - task: Bash@3
   displayName: "Removing docker image"
