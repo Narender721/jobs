@@ -1,5 +1,6 @@
 package com.tesco.AccessManager_v2.service;
 
+import com.tesco.AccessManager_v2.exception.DBEmptyException;
 import com.tesco.AccessManager_v2.model.UserModel;
 import com.tesco.AccessManager_v2.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +18,7 @@ public class UserServiceImpl implements UserService{
 
 
     public Flux<UserModel> getUsers(){
-        return userRepository.findAll();
+        return userRepository.findAll().switchIfEmpty(Mono.error(new DBEmptyException()));
     }
 
     public Flux<UserModel> getUsersByUnit(String unitId) {

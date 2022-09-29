@@ -50,9 +50,14 @@ public class UnitServiceImpl implements UnitService{
 //            throw new IdNullException();
 //        }
         Mono<UnitsModel> check = unitsRepository.findById(model.getUnit_Id());
-        UnitsModel model1 = check.share().block();
-        assert model1 != null;
-        System.out.println(model1.getUnit_Name());
+//        UnitsModel model1 = check.share().block();
+//        assert model1 != null;
+//        System.out.println(model1.getUnit_Name());
+//        final int[] get_unit = new int[1];
+        check.subscribe(get -> System.out.println(get.getUnit_Id()));
+        check.subscribe(get -> System.out.println(get.getUnit_Name()));
+//        System.out.println(get_unit[0]);
+
 //        Mono<Boolean> cc= check.hasElement();
 //        //        unitsRepository.findById(id).thenReturn(new duplicateEntryException(id));
 //        System.out.println(cc);

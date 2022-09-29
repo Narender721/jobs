@@ -1,7 +1,10 @@
 package com.tesco.AccessManager_v2.router;
 
+import com.tesco.AccessManager_v2.model.KafkaProducerMetadataDTO;
 import com.tesco.AccessManager_v2.model.UnitsModel;
 import com.tesco.AccessManager_v2.model.UserModel;
+import com.tesco.AccessManager_v2.service.MessageService;
+import com.tesco.AccessManager_v2.service.MessageServiceImpl;
 import com.tesco.AccessManager_v2.service.UserServiceImpl;
 import com.tesco.AccessManager_v2.utils.Constants;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
@@ -40,6 +43,9 @@ public class UserRouter {
     @Autowired
     UserServiceImpl userService;
 
+    @Autowired
+    MessageServiceImpl messageService;
+
 //    @Bean
 //    public WebProperties.Resources resources() {
 //        return new WebProperties.Resources();
@@ -50,7 +56,8 @@ public class UserRouter {
             {
                     @RouterOperation(path = Constants.UserPaths.ADD_USER, produces = {MediaType.APPLICATION_JSON_VALUE},
                             method = RequestMethod.POST,
-                            operation = @Operation(operationId = "addUsers", responses = {
+                            operation = @Operation(operationId = "addUsers", tags= {"Users"},
+                                    responses = {
                                     @ApiResponse(responseCode = "200", description = "success", content = @Content(schema = @Schema(implementation = UserModel.class))),
                                     @ApiResponse(responseCode = "400", description = "Bad Request"),
                                     @ApiResponse(responseCode = "404", description = "create end point not found")},
@@ -58,7 +65,8 @@ public class UserRouter {
                             )),
                     @RouterOperation(path= Constants.UserPaths.GET_USER_BYUNIT, produces = {MediaType.APPLICATION_JSON_VALUE},
                             method = RequestMethod.GET,
-                            operation = @Operation(operationId = "getUsersByUnit", responses = {
+                            operation = @Operation(operationId = "getUsersByUnit", tags= {"Users"},
+                                    responses = {
                                     @ApiResponse(responseCode = "200", description = "Success", content = @Content(schema = @Schema(implementation = UserModel.class))),
                                     @ApiResponse(responseCode = "400", description = "Bad Request"),
                                     @ApiResponse(responseCode = "404", description = "Unit not found")},
@@ -66,20 +74,23 @@ public class UserRouter {
                             )),
                     @RouterOperation(path = Constants.UserPaths.GET_USERS, produces = {
                             MediaType.APPLICATION_JSON_VALUE} ,method = RequestMethod.GET,
-                            operation = @Operation(operationId = "getUsers", responses = {
+                            operation = @Operation(operationId = "getUsers", tags= {"Users"},
+                                    responses = {
                                     @ApiResponse(responseCode = "200", description = "success", content = @Content(schema = @Schema(implementation = UserModel.class))),
                                     @ApiResponse(responseCode = "404", description = "Not found")}
                             )),
                     @RouterOperation(path = Constants.UserPaths.USER_ID, produces = {
                             MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET,
-                            operation = @Operation(operationId = "getUserByUserId", responses = {
+                            operation = @Operation(operationId = "getUserByUserId", tags= {"Users"},
+                                    responses = {
                                     @ApiResponse(responseCode = "200", description = "success", content = @Content(schema = @Schema(implementation = UserModel.class))),
                                     @ApiResponse(responseCode = "404", description = "Not found")},
                                     parameters = {@Parameter(in = ParameterIn.PATH, name = "user_Id")}
                             )),
                     @RouterOperation(path = Constants.UserPaths.UPDATE_USER, produces = {
                             MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.POST,
-                            operation = @Operation(operationId = "updateUser", responses = {
+                            operation = @Operation(operationId = "updateUser", tags= {"Users"},
+                                    responses = {
                                     @ApiResponse(responseCode = "200", description = "success", content = @Content(schema = @Schema(implementation = UnitsModel.class))),
                                     @ApiResponse(responseCode = "404", description = "Not found")},
                                     requestBody = @RequestBody(content = @Content(schema = @Schema(implementation = UserModel.class)))
@@ -87,17 +98,36 @@ public class UserRouter {
                             )),
                     @RouterOperation(path = Constants.UserPaths.DELETE_USER, produces = {
                             MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.DELETE,
-                            operation = @Operation(operationId = "delete", responses = {
+                            operation = @Operation(operationId = "delete", tags= {"Users"},
+                                    responses = {
                                     @ApiResponse(responseCode = "200", description = "success", content = @Content(schema = @Schema(implementation = UserModel.class))),
                                     @ApiResponse(responseCode = "404", description = "Not found")},
                                     parameters = {@Parameter(in = ParameterIn.PATH, name = "user_Id")}
-                            ))
+                            )),
+                    @RouterOperation(path = "/send", produces = {
+                            MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.POST,
+                            operation = @Operation(operationId = "sendMessage", tags= {"Kafka"},
+                                    responses = {
+                                    @ApiResponse(responseCode = "200", description = "success", content = @Content(schema = @Schema(implementation = UserModel.class))),
+                                    @ApiResponse(responseCode = "404", description = "Not found")},
+                                    requestBody = @RequestBody(content = @Content(schema = @Schema(implementation = UserModel.class)))
+                            )),
+
+                    @RouterOperation(path = "/receive", produces = { MediaType.APPLICATION_JSON_VALUE },
+                            method = RequestMethod.POST,
+                            operation = @Operation(operationId = "retrieveMessage", tags = {"Kafka"},
+                                responses = {
+                                    @ApiResponse(responseCode = "200" , description = "success", content = @Content(schema = @Schema(implementation = UserModel.class))),
+                                        @ApiResponse(responseCode = "404", description = "not found")},
+                                        requestBody = @RequestBody(content = @Content(schema = @Schema(implementation = KafkaProducerMetadataDTO.class))))
+                    )
             })
 
 
     RouterFunction<ServerResponse> routeUser(){
 
-        return RouterFunctions.route(RequestPredicates.POST(Constants.UserPaths.ADD_USER).and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), req ->
+        return RouterFunctions.route(RequestPredicates.POST(Constants.UserPaths.ADD_USER)
+                        .and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), req ->
                         req.body(BodyExtractors.toMono(UserModel.class)).flatMap(user ->
                                 userService.addUser(user)).flatMap(data ->
                                 ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(data)))
@@ -122,9 +152,23 @@ public class UserRouter {
 
                 .andRoute(RequestPredicates.DELETE(Constants.UserPaths.DELETE_USER),
                         request -> userService.deleteUser(request.pathVariable("user_Id"))
-                                .flatMap(data -> ServerResponse.noContent().build()));
+                                .flatMap(data -> ServerResponse.noContent().build()))
+
+                .andRoute(RequestPredicates.POST("/send")
+                        .and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)),
+                        req -> req.body(BodyExtractors.toMono(UserModel.class))
+                                .flatMap(user -> {
+                                    return messageService.sendMessage(user);
+                                })
+                                .flatMap(data -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(data)))
+
+                .andRoute(RequestPredicates.POST("/receive")
+                        .and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)),
+                        request -> request.body(BodyExtractors.toMono(KafkaProducerMetadataDTO.class))
+                                .flatMap(data -> messageService.retrieveMessage(data))
+                                .flatMap(data -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(data)));
+
 
     }
-
 
 }

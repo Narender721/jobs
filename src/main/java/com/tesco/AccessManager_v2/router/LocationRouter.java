@@ -47,8 +47,16 @@ public class LocationRouter {
 
         return RouterFunctions
                 .route(RequestPredicates.GET("/location"),
-                        req -> locationApi.getLocation().collectList()
-                        .flatMap(data -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(data)));
+                        req -> {
+                            try {
+                                return locationApi.getLocation().collectList()
+                                .flatMap(data -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(data));
+                            } catch (InterruptedException e) {
+                                throw new RuntimeException(e);
+                            }
+                        });
+//                .andRoute(RequestPredicates.POST("/bearer"),
+//                        request -> locationApi.getBearer());
 
     }
 }

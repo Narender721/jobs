@@ -50,27 +50,31 @@ public class UnitRouter {
             {
                     @RouterOperation(path = Constants.UnitPaths.GETUNITS, produces = {
                             MediaType.APPLICATION_JSON_VALUE} ,method = RequestMethod.GET,
-                            operation = @Operation(operationId = "getUnit", responses = {
+                            operation = @Operation(operationId = "getUnit", tags= {"Units"},
+                                    responses = {
                                     @ApiResponse(responseCode = "200", description = "success", content = @Content(schema = @Schema(implementation = UnitsModel.class))),
                                     @ApiResponse(responseCode = "404", description = "Not found")}
                             )),
                     @RouterOperation(path = Constants.UnitPaths.UNIT_ID , produces = {
                             MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET,
-                            operation = @Operation(operationId = "getUnitById", responses = {
+                            operation = @Operation(operationId = "getUnitById", tags= {"Units"},
+                                    responses = {
                                     @ApiResponse(responseCode = "200", description = "success", content = @Content(schema = @Schema(implementation = UnitsModel.class))),
                                     @ApiResponse(responseCode = "404", description = "Not found")},
                                     parameters = {@Parameter(in = ParameterIn.PATH, name = "unit_Id")}
                             )),
                     @RouterOperation(path = Constants.UnitPaths.ADDUNIT, produces = {
                             MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.POST,
-                            operation = @Operation(operationId = "add", responses = {
+                            operation = @Operation(operationId = "add", tags= {"Units"},
+                                    responses = {
                                     @ApiResponse(responseCode = "200", description = "success", content = @Content(schema = @Schema(implementation = UnitsModel.class))),
                                     @ApiResponse(responseCode = "404", description = "Not found")},
                                     requestBody = @RequestBody(content = @Content(schema = @Schema(implementation = UnitsModel.class)))
                             )),
                     @RouterOperation(path = Constants.UnitPaths.UPDATE, produces = {
                             MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.POST,
-                            operation = @Operation(operationId = "update", responses = {
+                            operation = @Operation(operationId = "update", tags= {"Units"},
+                                    responses = {
                                     @ApiResponse(responseCode = "200", description = "success", content = @Content(schema = @Schema(implementation = UnitsModel.class))),
                                     @ApiResponse(responseCode = "404", description = "Not found")},
                                     requestBody = @RequestBody(content = @Content(schema = @Schema(implementation = UnitsModel.class)))
@@ -78,17 +82,12 @@ public class UnitRouter {
                             )),
                     @RouterOperation(path = Constants.UnitPaths.DELETE, produces = {
                             MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.DELETE,
-                            operation = @Operation(operationId = "delete", responses = {
+                            operation = @Operation(operationId = "delete", tags= {"Units"},
+                                    responses = {
                                     @ApiResponse(responseCode = "200", description = "success", content = @Content(schema = @Schema(implementation = UnitsModel.class))),
                                     @ApiResponse(responseCode = "404", description = "Not found")},
                                     parameters = {@Parameter(in = ParameterIn.PATH, name = "unit_Id")}
                             ))
-//                    @RouterOperation(path = "/thread", produces = {
-//                            MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET,
-//                            operation = @Operation(operationId = "threadDump", responses = {
-//                                    @ApiResponse(responseCode = "200", description = "success"),
-//                                    @ApiResponse(responseCode = "404", description = "Not found")}
-//                            ))
             })
 
 
@@ -112,14 +111,11 @@ public class UnitRouter {
                                 .flatMap(data -> ok().contentType(MediaType.APPLICATION_JSON).bodyValue(data)))
                 .andRoute(RequestPredicates.DELETE(Constants.UnitPaths.DELETE),
                         request -> unitService.deleteUnit(request.pathVariable("unit_Id"))
-//                                .flatMap(data -> ok().contentType(MediaType.APPLICATION_JSON).bodyValue(data))) //change
                                 .flatMap(data -> ServerResponse.noContent().build()))
 
                 .andRoute(GET(Constants.UnitPaths.GETUNITS),
                         request -> unitService.getUnits().collectList()
                                 .flatMap(data-> ok().contentType(MediaType.APPLICATION_JSON).bodyValue(data)));
-//                .andRoute(GET("/thread").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), (HandlerFunction<ServerResponse>) generateThread.threadDump());
-
     }
 
 }
