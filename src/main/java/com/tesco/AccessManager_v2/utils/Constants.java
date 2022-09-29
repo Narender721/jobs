@@ -44,7 +44,9 @@ public final class Constants {
     public static final class LocationPaths{
 
         public static final String GET_LOCATION = "/location";
-
+        public static final String BEARER_BODYJSON = "{\"grant_type\":\"client_credentials\",\"client_id\":\"6434f06e-028d-4a4a-9835-5637952d180e\",\"client_secret\":\"1a4e374d-3dc2-4c2e-aef9-e7a6e28718e1\"}";
+        public static final String BEARER_URI = "https://api-ppe.tesco.com/identity/v4/issue-token/token";
+        public static final String LOCATIONAPI_URI = "https://api-ppe.tesco.com/tescolocation/v4/locations?fields=lifecycle&limit=100&offset=200";
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
