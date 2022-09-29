@@ -1,4 +1,4 @@
-package com.tesco.AccessManager_v2.service;
+package com.tesco.AccessManager_v2.service.implementation;
 
 import com.tesco.AccessManager_v2.exception.DBEmptyException;
 //import com.tesco.AccessManager_v2.exception.DuplicateEntryException;
@@ -6,6 +6,7 @@ import com.tesco.AccessManager_v2.exception.IdNullException;
 import com.tesco.AccessManager_v2.exception.UnitNotFoundException;
 import com.tesco.AccessManager_v2.model.UnitsModel;
 import com.tesco.AccessManager_v2.repository.UnitsRepository;
+import com.tesco.AccessManager_v2.service.UnitService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,7 +15,7 @@ import reactor.core.publisher.Mono;
 
 @Service
 @Slf4j
-public class UnitServiceImpl implements UnitService{
+public class UnitServiceImpl implements UnitService {
 
     @Autowired
     UnitsRepository unitsRepository;
@@ -22,7 +23,6 @@ public class UnitServiceImpl implements UnitService{
     public Flux<UnitsModel> getUnits(){
         log.debug("return Units");
         return unitsRepository.findAll().switchIfEmpty(Mono.error(new DBEmptyException()));
-        //raise exception if db is empty
     }
 
     public Mono<UnitsModel> getUnitById(String id){
@@ -33,9 +33,10 @@ public class UnitServiceImpl implements UnitService{
         log.debug("return Unit details for Unit " + unitId);
 
         Mono<UnitsModel> check = unitsRepository.findById(unitId);
-        UnitsModel model1 = check.share().block();
-        assert model1 != null;
-        System.out.println(model1.getUnit_Name());
+
+//        UnitsModel model1 = check.share().block();
+//        assert model1 != null;
+//        System.out.println(model1.getUnit_Name());
 
         return unitsRepository.findById(unitId).switchIfEmpty(Mono.error(new UnitNotFoundException(unitId)));
     }
@@ -54,8 +55,10 @@ public class UnitServiceImpl implements UnitService{
 //        assert model1 != null;
 //        System.out.println(model1.getUnit_Name());
 //        final int[] get_unit = new int[1];
-        check.subscribe(get -> System.out.println(get.getUnit_Id()));
-        check.subscribe(get -> System.out.println(get.getUnit_Name()));
+
+//        check.subscribe(get -> System.out.println(get.getUnit_Id()));
+//        check.subscribe(get -> System.out.println(get.getUnit_Name()));
+
 //        System.out.println(get_unit[0]);
 
 //        Mono<Boolean> cc= check.hasElement();

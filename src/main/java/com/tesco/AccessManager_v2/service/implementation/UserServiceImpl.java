@@ -1,8 +1,9 @@
-package com.tesco.AccessManager_v2.service;
+package com.tesco.AccessManager_v2.service.implementation;
 
 import com.tesco.AccessManager_v2.exception.DBEmptyException;
 import com.tesco.AccessManager_v2.model.UserModel;
 import com.tesco.AccessManager_v2.repository.UserRepository;
+import com.tesco.AccessManager_v2.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,7 +12,7 @@ import reactor.core.publisher.Mono;
 
 @Service
 @Slf4j
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
     @Autowired
     UserRepository userRepository;

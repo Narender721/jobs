@@ -1,9 +1,10 @@
-package com.tesco.AccessManager_v2.service;
+package com.tesco.AccessManager_v2.service.implementation;
 
 import com.tesco.AccessManager_v2.model.AuthorizationModel;
 import com.tesco.AccessManager_v2.model.LocationApiDTO;
 import com.tesco.AccessManager_v2.model.UnitsModel;
 import com.tesco.AccessManager_v2.model.UserModel;
+import com.tesco.AccessManager_v2.service.LocationApi;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ import java.util.*;
 
 @Service
 @Slf4j
-public class LocationApiImpl {
+public class LocationApiImpl implements LocationApi {
 
     private  WebClient webClient;
     String globalBearerToken=null;

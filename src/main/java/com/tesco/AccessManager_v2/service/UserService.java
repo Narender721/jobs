@@ -10,7 +10,7 @@ public interface UserService {
 
     Flux<UserModel> getUsers();
     Mono<UserModel> addUser(UserModel userModel);
-//    Mono<UserModel> getUsersByUnit(String unitId);
+    Flux<UserModel> getUsersByUnit(String unitId);
     Mono<UserModel> getUserByUserId(String user_Id);
     Mono<UserModel> updateUser(UserModel userModel);
     Mono<Void> deleteUser(String id);

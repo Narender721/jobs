@@ -1,13 +1,11 @@
 package com.tesco.AccessManager_v2.router;
 
 import com.tesco.AccessManager_v2.model.LocationApiDTO;
-import com.tesco.AccessManager_v2.model.UserModel;
-import com.tesco.AccessManager_v2.service.LocationApiImpl;
+import com.tesco.AccessManager_v2.service.implementation.LocationApiImpl;
 import com.tesco.AccessManager_v2.utils.Constants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.RouterOperation;
@@ -17,8 +15,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.reactive.function.BodyExtractors;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
@@ -34,9 +30,10 @@ public class LocationRouter {
     @Bean
     @RouterOperations(
             {
-                    @RouterOperation(path = "/location", produces = {MediaType.APPLICATION_JSON_VALUE},
+                    @RouterOperation(path = Constants.LocationPaths.GET_LOCATION, produces = {MediaType.APPLICATION_JSON_VALUE},
                             method = RequestMethod.GET,
-                            operation = @Operation(operationId = "getLocation", responses = {
+                            operation = @Operation(operationId = "getLocation", tags= {"Location"},
+                                    responses = {
                                     @ApiResponse(responseCode = "200", description = "success", content = @Content(schema = @Schema(implementation = LocationApiDTO.class))),
                                     @ApiResponse(responseCode = "400", description = "Bad Request")}
                             ))
@@ -46,7 +43,7 @@ public class LocationRouter {
     RouterFunction<ServerResponse> routeLocation(){
 
         return RouterFunctions
-                .route(RequestPredicates.GET("/location"),
+                .route(RequestPredicates.GET(Constants.LocationPaths.GET_LOCATION),
                         req -> {
                             try {
                                 return locationApi.getLocation().collectList()
@@ -55,8 +52,5 @@ public class LocationRouter {
                                 throw new RuntimeException(e);
                             }
                         });
-//                .andRoute(RequestPredicates.POST("/bearer"),
-//                        request -> locationApi.getBearer());
-
     }
 }

@@ -1,22 +1,17 @@
 package com.tesco.AccessManager_v2.router;
 
-import com.tesco.AccessManager_v2.model.KafkaProducerMetadataDTO;
 import com.tesco.AccessManager_v2.model.UnitsModel;
 import com.tesco.AccessManager_v2.model.UserModel;
-import com.tesco.AccessManager_v2.service.MessageService;
-import com.tesco.AccessManager_v2.service.MessageServiceImpl;
-import com.tesco.AccessManager_v2.service.UserServiceImpl;
+import com.tesco.AccessManager_v2.service.implementation.MessageServiceImpl;
+import com.tesco.AccessManager_v2.service.implementation.UserServiceImpl;
 import com.tesco.AccessManager_v2.utils.Constants;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.RouterOperation;
 import org.springdoc.core.annotations.RouterOperations;
@@ -36,8 +31,6 @@ import static org.springframework.web.reactive.function.server.ServerResponse.ok
 
 @Controller
 @Slf4j
-@Tag(name = "User APIs", description = "User api collection")
-//@RouterOperation(path = Constants.UserPaths.BASEPATH_USER)
 public class UserRouter {
 
     @Autowired
@@ -103,24 +96,7 @@ public class UserRouter {
                                     @ApiResponse(responseCode = "200", description = "success", content = @Content(schema = @Schema(implementation = UserModel.class))),
                                     @ApiResponse(responseCode = "404", description = "Not found")},
                                     parameters = {@Parameter(in = ParameterIn.PATH, name = "user_Id")}
-                            )),
-                    @RouterOperation(path = "/send", produces = {
-                            MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.POST,
-                            operation = @Operation(operationId = "sendMessage", tags= {"Kafka"},
-                                    responses = {
-                                    @ApiResponse(responseCode = "200", description = "success", content = @Content(schema = @Schema(implementation = UserModel.class))),
-                                    @ApiResponse(responseCode = "404", description = "Not found")},
-                                    requestBody = @RequestBody(content = @Content(schema = @Schema(implementation = UserModel.class)))
-                            )),
-
-                    @RouterOperation(path = "/receive", produces = { MediaType.APPLICATION_JSON_VALUE },
-                            method = RequestMethod.POST,
-                            operation = @Operation(operationId = "retrieveMessage", tags = {"Kafka"},
-                                responses = {
-                                    @ApiResponse(responseCode = "200" , description = "success", content = @Content(schema = @Schema(implementation = UserModel.class))),
-                                        @ApiResponse(responseCode = "404", description = "not found")},
-                                        requestBody = @RequestBody(content = @Content(schema = @Schema(implementation = KafkaProducerMetadataDTO.class))))
-                    )
+                            ))
             })
 
 
@@ -152,21 +128,7 @@ public class UserRouter {
 
                 .andRoute(RequestPredicates.DELETE(Constants.UserPaths.DELETE_USER),
                         request -> userService.deleteUser(request.pathVariable("user_Id"))
-                                .flatMap(data -> ServerResponse.noContent().build()))
-
-                .andRoute(RequestPredicates.POST("/send")
-                        .and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)),
-                        req -> req.body(BodyExtractors.toMono(UserModel.class))
-                                .flatMap(user -> {
-                                    return messageService.sendMessage(user);
-                                })
-                                .flatMap(data -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(data)))
-
-                .andRoute(RequestPredicates.POST("/receive")
-                        .and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)),
-                        request -> request.body(BodyExtractors.toMono(KafkaProducerMetadataDTO.class))
-                                .flatMap(data -> messageService.retrieveMessage(data))
-                                .flatMap(data -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(data)));
+                                .flatMap(data -> ServerResponse.noContent().build()));
 
 
     }

@@ -39,4 +39,19 @@ public final class Constants {
 
         public static final String GET_USER_BYUNIT = "/user/getUsersByUnit/{unit_Id}";
     }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class LocationPaths{
+
+        public static final String GET_LOCATION = "/location";
+
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class KafkaPaths{
+
+        public static final String SEND_KAKFA = "/send";
+        public static final String RECEIVE_KAKFA = "/receive";
+
+    }
 }

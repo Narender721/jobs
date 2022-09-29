@@ -2,7 +2,7 @@ package com.tesco.AccessManager_v2.router;
 
 import com.tesco.AccessManager_v2.model.UnitsModel;
 //import com.tesco.AccessManager_v2.service.GenerateThread;
-import com.tesco.AccessManager_v2.service.UnitServiceImpl;
+import com.tesco.AccessManager_v2.service.implementation.UnitServiceImpl;
 import com.tesco.AccessManager_v2.utils.Constants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
