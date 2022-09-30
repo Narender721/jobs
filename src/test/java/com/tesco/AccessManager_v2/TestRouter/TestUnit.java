@@ -23,6 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -45,6 +46,7 @@ public class TestUnit {
     UnitsModel data1 = new UnitsModel(1,"Store_1");
     UnitsModel data2 = new UnitsModel(2,"Store_2");
     UnitsModel data3 = new UnitsModel(3,"Store_3");
+    UnitsModel dataNull = new UnitsModel();
     UnitsModel data4 = new UnitsModel();
     UnitsModel data5 = new UnitsModel();
     Mono<UnitsModel> data1_Mono = Mono.just(data1);
@@ -197,11 +199,23 @@ public class TestUnit {
     public void testAddUnitIdNull(){
 
         Mockito.when(unitsRepository.findById(0)).thenReturn(Mono.empty());
-        webTestClient.post().uri("/unit/addUser")
+
+        webTestClient.post().uri(Constants.UnitPaths.ADDUNIT)
+//                .body(BodyInserters.fromValue(Constants.UnitPaths.DATA_NULL))
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody();
 //                .json("{\"message\":\"Provide proper ID value\"}\n");
+    }
+
+    @Test
+    public void testAddUnitDuplicate() throws Exception {
+        Mockito.when(unitsRepository.save(data1)).thenReturn(data1_Mono);
+
+        webTestClient.post().uri(Constants.UnitPaths.ADDUNIT)
+                .body(Mono.just(data1),UnitsModel.class)
+                .exchange().expectStatus().isOk()
+                .expectBody(UnitsModel.class).isEqualTo(data1);
     }
 
     @Test

@@ -2,6 +2,7 @@ package com.tesco.AccessManager_v2.service.implementation;
 
 import com.tesco.AccessManager_v2.exception.DBEmptyException;
 //import com.tesco.AccessManager_v2.exception.DuplicateEntryException;
+//import com.tesco.AccessManager_v2.exception.DuplicateEntryException;
 import com.tesco.AccessManager_v2.exception.IdNullException;
 import com.tesco.AccessManager_v2.exception.UnitNotFoundException;
 import com.tesco.AccessManager_v2.model.UnitsModel;
@@ -32,28 +33,35 @@ public class UnitServiceImpl implements UnitService {
 
         log.debug("return Unit details for Unit " + unitId);
 
-        Mono<UnitsModel> check = unitsRepository.findById(unitId);
+//        Mono<UnitsModel> check = unitsRepository.findById(unitId);
 
 //        UnitsModel model1 = check.share().block();
 //        assert model1 != null;
 //        System.out.println(model1.getUnit_Name());
 
         return unitsRepository.findById(unitId).switchIfEmpty(Mono.error(new UnitNotFoundException(unitId)));
+
+
     }
 
 
     public Mono<UnitsModel> add(UnitsModel model) { //post
 
-//        log.debug("Created Unit " + model.getUnit_Id());
-//        int id = model.getUnit_Id();
-//        if(id == 0)
-//        {
-//            throw new IdNullException();
-//        }
+        log.debug("Created Unit " + model.getUnit_Id());
+        int id = model.getUnit_Id();
+        System.out.println(id);
+        if(id == 0)
+            throw new IdNullException();
+
         Mono<UnitsModel> check = unitsRepository.findById(model.getUnit_Id());
+//        if(check != null)
+//        // if check empty thn add else throw id exist
 //        UnitsModel model1 = check.share().block();
-//        assert model1 != null;
-//        System.out.println(model1.getUnit_Name());
+//        if(model1 != null)
+//        {
+//            throw new DuplicateEntryException(model.getUnit_Id());
+//        }
+
 //        final int[] get_unit = new int[1];
 
 //        check.subscribe(get -> System.out.println(get.getUnit_Id()));
@@ -65,7 +73,7 @@ public class UnitServiceImpl implements UnitService {
 //        //        unitsRepository.findById(id).thenReturn(new duplicateEntryException(id));
 //        System.out.println(cc);
 //        check.defaultIfEmpty(new UnitNotFoundException());
-        return unitsRepository.save(model).switchIfEmpty(Mono.error(new IdNullException()));
+        return unitsRepository.save(model);
     }
 
     public Mono<UnitsModel> update(UnitsModel model) {
@@ -83,6 +91,15 @@ public class UnitServiceImpl implements UnitService {
         {
             throw new IdNullException();
         }
+        Mono<UnitsModel> check = unitsRepository.findById(model.getUnit_Id());
+        // if check empty thn add else throw id exist
+        UnitsModel model1 = check.share().block();
+        if(model1 == null)
+        {
+            throw new UnitNotFoundException(model.getUnit_Id());
+        }
+
+        unitsRepository.findById(model.getUnit_Id()).switchIfEmpty(Mono.error(new UnitNotFoundException(id)));
 
         return unitsRepository.findById(model.getUnit_Id())
                 .map( temp-> {
@@ -98,7 +115,14 @@ public class UnitServiceImpl implements UnitService {
             throw new IdNullException();
         log.debug("Deleted Unit " + unitId);
 
-//        unitsRepository.findById(unitId).switchIfEmpty(Mono.error(new UnitNotFoundException(unitId)));
+//        Mono<UnitsModel> check = unitsRepository.findById(unitId);
+//        // if check empty thn add else throw id exist
+//        UnitsModel model1 = check.share().block();
+//        if(model1 == null)
+//        {
+//            throw new UnitNotFoundException(unitId);
+//        }
+        unitsRepository.findById(unitId).switchIfEmpty(Mono.error(new UnitNotFoundException(unitId)));
         return unitsRepository.deleteById(unitId);
 //                .switchIfEmpty(Mono.error(new UnitNotFoundException(unitId)));
     }

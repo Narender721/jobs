@@ -38,6 +38,7 @@ public class TestUser {
     Mono<UserModel> data3_Mono = Mono.just(data3);
 
     Flux<UserModel> data_Flux = Flux.just(data1,data2,data3);
+    Flux<UserModel> data_Null = Flux.empty();
 
     @Test
     public void testGetAllUsers(){
@@ -105,6 +106,7 @@ public class TestUser {
     @Test
     public void testUpdateUser() throws Exception {
         Mockito.when(userRepository.save(data2)).thenReturn(data2_Mono);
+        Mockito.when(userRepository.findById(data2.getUser_Id())).thenReturn(data2_Mono);
 
         webTestClient.post().uri(Constants.UserPaths.UPDATE_USER)
                 .body(Mono.just(data2),UserModel.class)
@@ -119,5 +121,74 @@ public class TestUser {
         webTestClient.delete().uri("/user/delete/1")
                 .exchange()
                 .expectStatus().isOk();
+    }
+
+    @Test
+    public void testGetAllUsersNull(){
+        Mockito.when(userRepository.findAll()).thenReturn(data_Null);
+        webTestClient.get().uri(Constants.UserPaths.GET_USERS)
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .json("{\"message\":\"Database empty\"}");
+    }
+
+    @Test
+    public void testGetUsersByIDNull(){
+        webTestClient.get().uri("/user/getUser/0")
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .json("{\"message\":\"Provide proper ID value\"}\n");
+    }
+
+    @Test
+    public void testGetUserByIDNotFound(){
+        Mockito.when(userRepository.findById(1)).thenReturn(Mono.empty());
+        webTestClient.get().uri("/user/getUser/1")
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .json("{\"message\":\"1 not found\"}\n");
+    }
+
+    @Test
+    public void testDeleteUserIdNull(){
+        String uri="/user/delete/0";
+        System.out.println(webTestClient.delete().uri(uri)
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .json("{\"message\":\"Provide proper ID value\"}\n"));
+    }
+
+    @Test
+    public void testDeleteUserIDNotFound(){
+        Mockito.when(userRepository.findById(1)).thenReturn(Mono.empty());
+
+        webTestClient.get().uri("/user/delete/1")
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody();
+//                .json("{\"message\":\"1 not found\"}\n");
+
+    }
+
+    @Test
+    public void testAddUserIdNull(){
+        Mockito.when(userRepository.findById(0)).thenReturn(Mono.empty());
+        webTestClient.post().uri("/user/addUser")
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody();
+    }
+
+    @Test
+    public void testUpdateUserIdNull(){
+        Mockito.when(userRepository.findById(1)).thenReturn(Mono.empty());
+        webTestClient.post().uri("/user/update")
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody();
     }
 }

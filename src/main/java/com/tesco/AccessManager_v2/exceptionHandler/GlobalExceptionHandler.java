@@ -2,6 +2,7 @@ package com.tesco.AccessManager_v2.exceptionHandler;
 
 import com.tesco.AccessManager_v2.exception.DBEmptyException;
 //import com.tesco.AccessManager_v2.exception.DuplicateEntryException;
+//import com.tesco.AccessManager_v2.exception.DuplicateEntryException;
 import com.tesco.AccessManager_v2.exception.IdNullException;
 import com.tesco.AccessManager_v2.exception.UnitNotFoundException;
 import org.springframework.boot.autoconfigure.web.WebProperties.Resources;

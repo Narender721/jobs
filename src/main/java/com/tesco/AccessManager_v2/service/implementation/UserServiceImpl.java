@@ -1,6 +1,8 @@
 package com.tesco.AccessManager_v2.service.implementation;
 
 import com.tesco.AccessManager_v2.exception.DBEmptyException;
+import com.tesco.AccessManager_v2.exception.IdNullException;
+import com.tesco.AccessManager_v2.exception.UnitNotFoundException;
 import com.tesco.AccessManager_v2.model.UserModel;
 import com.tesco.AccessManager_v2.repository.UserRepository;
 import com.tesco.AccessManager_v2.service.UserService;
@@ -27,23 +29,56 @@ public class UserServiceImpl implements UserService {
     }
 
     public Mono<UserModel> getUserByUserId(String user_Id){
-        int id = Integer.parseInt(user_Id);
-        return userRepository.findById(id);
+
+        int userId=Integer.parseInt(user_Id);
+        if(userId == 0)
+            throw new IdNullException();
+
+        log.debug("return User details for User " + userId);
+
+        Mono<UserModel> check = userRepository.findById(userId);
+//        UserModel model1 = check.share().block();
+//        assert model1 != null;
+//        System.out.println(model1.getUser_Name());
+
+        return userRepository.findById(userId).switchIfEmpty(Mono.error(new UnitNotFoundException(userId)));
     }
 
     public Mono<UserModel> addUser(UserModel userModel){
+
         log.debug("User added " + userModel.getUser_Id());
-        return userRepository.save(userModel);
+        Mono<UserModel> check = userRepository.findById(userModel.getUser_Id());
+
+//        UserModel model1 = check.share().block();
+//        assert model1 != null;
+//        System.out.println(model1.getUser_Name());
+
+        return userRepository.save(userModel).switchIfEmpty(Mono.error(new IdNullException()));
     }
 
     public Mono<UserModel> updateUser(UserModel model){
-        return userRepository.save(model);
+
+        int id = model.getUser_Id();
+        if(id == 0)
+        {
+            throw new IdNullException();
+        }
+        return userRepository.findById(model.getUser_Id())
+                .map(temp -> {
+                    temp.setUser_Name(model.getUser_Name());
+                    return temp;
+                }).flatMap( user -> userRepository.save(user));
     }
 
     public Mono<Void> deleteUser(String id) {
-//        System.out.println(id);
+
         int userId=Integer.parseInt(id);
+        if(userId == 0)
+            throw new IdNullException();
+        log.debug("Deleted Unit " + userId);
+
         return userRepository.deleteById(userId);
+
     }
 
 }
