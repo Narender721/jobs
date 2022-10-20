@@ -4,10 +4,10 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/java
 
 trigger:
-- main
+- master
 
 pool:
-  name: 'CP-Azure-agent-VM'
+  vmImage: ubuntu-latest
 
 variables: 
   - name: dockerImageName
@@ -45,12 +45,11 @@ steps:
 - task: Docker@2
   inputs:
     containerRegistry: 'Docker'
-    repository: 'imagebuild7 / react'
+    repository: 'imagebuild7 / react-backend-dep'
     command: 'buildAndPush'
     Dockerfile: '**/Dockerfile'
-    tags: |
-      latest
-      $(Build.BuildId)
+    tags: 'latest'
+    
     
 
 - task: Bash@3
